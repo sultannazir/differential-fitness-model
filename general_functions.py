@@ -1,29 +1,36 @@
 import numpy as np
 from scipy import stats
-import matplotlib.pyplot as plt
-import seaborn as sns
+import random
+
+def parameters_to_global_variables(Parameters):
+
+    keys = list(Parameters.keys())
+    for i in keys:
+        globals()[i] = Parameters[i]
 
 def trunc_samples(mu, sigma, lower, upper, num_samples):
     n = stats.truncnorm((lower - mu) / sigma, (upper - mu) / sigma, loc=mu, scale=sigma)
     samples = [list((n.rvs(num_samples[0])).flatten()) for i in range(num_samples[1])]
     return samples
 
-def initialize_Kval(K1,K2,stdK,init_size, K_min_clip, K1_max_clip, K2_max_clip, M):
-# inital K1 and K2 value distributions in M hosts
-    K1val = trunc_samples(K1, stdK, K_min_clip, K1_max_clip, (M, init_size))
-    K2val = trunc_samples(K2, stdK, K_min_clip, K2_max_clip, (M, init_size))
+def initialize_Kval():
+# inital K1 and K2 value distributions in H hosts
+    K1val = trunc_samples(K1, stdK, K_min, K1_max, (init_size, H))
+    K2val = trunc_samples(K2, stdK, K_min, K2_max, (init_size, H))
 
     return(K1val, K2val)
 
-def initialize_Ival(stdI, init_size):
-# inital alpha value distribution I12mat = effects of microbe 1 on microbe 2
-    I12val = trunc_samples(0, stdI, -1, 1, (M, init_size))
-    I21val = trunc_samples(0, stdI, -1, 1, (M, init_size))
+def initialize_Ival():
+# inital alpha value distribution
+    I12val = trunc_samples(0, stdI, 0, 1, (init_size, H))
+    I12val = [[round(num, 3) for num in j] for j in I12val]
+    I21val = trunc_samples(0, stdI, 0, 1, (init_size, H))
+    I21val = [[round(num, 3) for num in j] for j in I21val]
 
     return(I12val, I21val)
 
 
-def death(Kvals, Iijvals, d):
+def death(Kvals, Iijvals):
 
     num_mic = len(Kvals)
     probs = np.random.random(num_mic)
@@ -34,39 +41,44 @@ def death(Kvals, Iijvals, d):
 
     return(Kvals, Iijvals)
 
-def birth_propensity(Kvals, w):
-    prop = w*(1 - len(Kvals)/np.array(Kvals)) # birth propensities
-    return(prop)
+def birth_propensity(Kvals, Iijval, Mi, Mj, sign):
+    birth = w*(1 - len(Kvals)/np.array(Kvals)) # birth propensities
+    interaction = (1 - w) * sign * np.array(Iijval) * Mj / (Mi + Mj)
+    return(birth + interaction)
 
-def colonize(K1val, K2val, I12val, I21val, env_rat1, m, K1, K2, stdK, stdI, K_min_clip, K1_max_clip, K2_max_clip):
-    colprob = np.random.random()
-    if colprob < m:
-        prob = np.random.random()
-        if prob < env_rat1:
-            K1val.append(trunc_samples(K1,stdK,K_min_clip, K1_max_clip,(1,1))[0][0])
-            I12val.append(trunc_samples(0, stdI, -1, 1, (1, 1))[0][0])
-        else:
-            K2val.append(trunc_samples(K2, stdK, K_min_clip, K2_max_clip, (1, 1))[0][0])
-            I21val.append(trunc_samples(0, stdI, -1, 1, (1, 1))[0][0])
+def colonize(K1val, K2val, I12val, I21val):
+
+    n1 = int(np.random.binomial(m, env_rat1, 1))
+    n2 = m - n1
+
+    newK1 = trunc_samples(K1, stdK, K_min, K1_max, (n1, 1))[0]
+    newI12 = trunc_samples(0, stdI, 0, 1, (n1, 1))[0]
+    newI12 = [round(num, 3) for num in newI12]
+    newK2 = trunc_samples(K2, stdK, K_min, K2_max, (n2, 1))[0]
+    newI21 = trunc_samples(0, stdI, 0, 1, (n2, 1))[0]
+    newI21 = [round(num, 3) for num in newI21]
+
+    K1val = K1val + newK1
+    I12val = I12val + newI12
+    K2val = K2val + newK2
+    I21val = I21val + newI21
+
     return(K1val, K2val, I12val, I21val)
 
-def update_microbes(K1val, K2val, I12val, I21val, d, w, m, env_rat1, K1, K2, stdK, stdI, K_min_clip, K1_max_clip,
-                    K2_max_clip):
+def update_microbes(K1val, K2val, I12val, I21val):
 
     for h in range(len(K1val)):
 
+        # colonization
+        K1val[h], K2val[h], I12val[h], I21val[h] = colonize(K1val[h], K2val[h], I12val[h], I21val[h])
+
         # random death
-        K1val[h], I12val[h] = death(K1val[h], I12val[h], d)
-        K2val[h], I21val[h] = death(K2val[h], I21val[h], d)
+        K1val[h], I12val[h] = death(K1val[h], I12val[h])
+        K2val[h], I21val[h] = death(K2val[h], I21val[h])
 
-        prop1 = birth_propensity(K1val[h], w)
-        prop2 = birth_propensity(K2val[h], w)
-
-        interaction1 = (1-w)*sum(I21val[h])/len(I21val[h])
-        interaction2 = (1-w)*sum(I12val[h])/len(I12val[h])
-
-        prop1 += interaction1
-        prop2 += interaction2
+        # birth + interaction values
+        prop1 = birth_propensity(K1val[h],I12val[h], len(I12val), len(I21val), sign1)
+        prop2 = birth_propensity(K2val[h],I21val[h], len(I21val), len(I12val), sign2)
 
         # death by antagonistic interactions
         selected_die1 = [i for i in range(len(prop1)) if prop1[i] < 0]
@@ -93,8 +105,20 @@ def update_microbes(K1val, K2val, I12val, I21val, d, w, m, env_rat1, K1, K2, std
             K2val[h].append(K2val[h][i])
             I21val[h].append(I21val[h][i])
 
-        # colonization
-        K1val[h], K2val[h], I12val[h], I21val[h] = colonize(K1val[h], K2val[h], I12val[h], I21val[h], env_rat1,
-                                                            m, K1, K2, stdK, stdI, K_min_clip, K1_max_clip, K2_max_clip)
+    return(K1val, K2val, I12val, I21val)
+
+def bottleneck(K1val, K2val, I12val, I21val):
+
+    N = int(np.ceil(b*(len(K1val) + len(K2val))))
+    n1 = int(np.random.binomial(N, len(K1val)/(len(K1val) + len(K2val))))
+    n2 = N - n1
+
+    selected1 = random.sample(range(0, len(K1val)), n1)
+    selected2 = random.sample(range(0, len(K2val)), n2)
+
+    K1val = [v for i, v in enumerate(K1val) if i in frozenset(set(selected1))]
+    I12val = [v for i, v in enumerate(I12val) if i in frozenset(set(selected1))]
+    K2val = [v for i, v in enumerate(K2val) if i in frozenset(set(selected2))]
+    I21val = [v for i, v in enumerate(I21val) if i in frozenset(set(selected2))]
 
     return(K1val, K2val, I12val, I21val)
