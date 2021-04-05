@@ -16,7 +16,9 @@ def trunc_samples(mu, sigma, lower, upper, num_samples):
 def initialize_Kval():
 # inital K1 and K2 value distributions in H hosts
     K1val = trunc_samples(K1, stdK, K_min, K1_max, (init_size, H))
+    K1val = [[int(num) for num in j] for j in K1val]
     K2val = trunc_samples(K2, stdK, K_min, K2_max, (init_size, H))
+    K2val = [[int(num) for num in j] for j in K2val]
 
     return(K1val, K2val)
 
@@ -52,9 +54,11 @@ def colonize(K1val, K2val, I12val, I21val):
     n2 = m - n1
 
     newK1 = trunc_samples(K1, stdK, K_min, K1_max, (n1, 1))[0]
+    newK1 = [int(num) for num in newK1]
     newI12 = trunc_samples(0, stdI, 0, 1, (n1, 1))[0]
     newI12 = [round(num, 3) for num in newI12]
     newK2 = trunc_samples(K2, stdK, K_min, K2_max, (n2, 1))[0]
+    newK2 = [int(num) for num in newK2]
     newI21 = trunc_samples(0, stdI, 0, 1, (n2, 1))[0]
     newI21 = [round(num, 3) for num in newI21]
 

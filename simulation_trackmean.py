@@ -3,16 +3,16 @@ import pandas as pd
 import statistics as st
 
 Parameters = {'H' : 1,             # Number of hosts
-              'K1' : 50000,       # Mean value of 'within-host fitness' of microbes of type 1 in the environment
-              'K2' : 10000,       # Mean value of 'within-host fitness' of microbes of type 2 in the environment
-              'stdK' : 5000,      # Standard deviation of 'within-host fitness' of microbes in the environment
+              'K1' : 500000,       # Mean value of 'within-host fitness' of microbes of type 1 in the environment
+              'K2' : 100000,       # Mean value of 'within-host fitness' of microbes of type 2 in the environment
+              'stdK' : 50000,      # Standard deviation of 'within-host fitness' of microbes in the environment
               'stdI' : 1,          # Standard deviation of 'within-host interaction coefficients'...
                                    # of microbes in the environment
               'env_rat1' : 0.2,    # Relative abundance of type 1 microbes in the environment = K1'/(K1' + K2')
               'init_size' : 100,   # Initial population size of each microbe type in the host(s)
               'K_min' : 100,       # Minimum value of within-host fitness any microbe can attain
-              'K1_max' : 100000,  # Maximum value of within-host fitness type 1 microbes can attain
-              'K2_max' : 20000,   # Maximum value of within-host fitness type 2 microbes can attain
+              'K1_max' : 1000000,  # Maximum value of within-host fitness type 1 microbes can attain
+              'K2_max' : 200000,   # Maximum value of within-host fitness type 2 microbes can attain
               'd' : 0.01,          # Probability of death of a microbe in host at each time step
               'w' : 0.5,           # Relative effect of intraspecific interactions to interspecific interactions in
                                    # birth and death of a microbe
@@ -26,7 +26,7 @@ Parameters = {'H' : 1,             # Number of hosts
 
 gf.parameters_to_global_variables(Parameters)
 
-def run_simulation():
+def run_simulation_getmean():
 
     data = []
 
@@ -61,6 +61,6 @@ def run_simulation():
 
     return(df)
 
-Data = run_simulation()
+Data = run_simulation_getmean()
 
-Data.to_csv('sample2.csv')
+Data.to_csv('sample3.csv')
