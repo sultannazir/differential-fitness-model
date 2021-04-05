@@ -2,25 +2,25 @@ import general_functions as gf
 import csv
 
 Parameters = {'H' : 1,             # Number of hosts
-              'K1' : 500,       # Mean value of 'within-host fitness' of microbes of type 1 in the environment
-              'K2' : 100,       # Mean value of 'within-host fitness' of microbes of type 2 in the environment
-              'stdK' : 50,      # Standard deviation of 'within-host fitness' of microbes in the environment
+              'K1' : 50000,       # Mean value of 'within-host fitness' of microbes of type 1 in the environment
+              'K2' : 10000,       # Mean value of 'within-host fitness' of microbes of type 2 in the environment
+              'stdK' : 5000,      # Standard deviation of 'within-host fitness' of microbes in the environment
               'stdI' : 1,          # Standard deviation of 'within-host interaction coefficients'...
                                    # of microbes in the environment
               'env_rat1' : 0.2,    # Relative abundance of type 1 microbes in the environment = K1'/(K1' + K2')
-              'init_size' : 10,   # Initial population size of each microbe type in the host(s)
-              'K_min' : 10,       # Minimum value of within-host fitness any microbe can attain
-              'K1_max' : 1000,  # Maximum value of within-host fitness type 1 microbes can attain
-              'K2_max' : 200,   # Maximum value of within-host fitness type 2 microbes can attain
+              'init_size' : 100,   # Initial population size of each microbe type in the host(s)
+              'K_min' : 100,       # Minimum value of within-host fitness any microbe can attain
+              'K1_max' : 100000,  # Maximum value of within-host fitness type 1 microbes can attain
+              'K2_max' : 20000,   # Maximum value of within-host fitness type 2 microbes can attain
               'd' : 0.01,          # Probability of death of a microbe in host at each time step
               'w' : 0.5,           # Relative effect of intraspecific interactions to interspecific interactions in
                                    # birth and death of a microbe
-              'm' : 10,           # Size of colonizing microbe population at each time step
+              'm' : 100,           # Size of colonizing microbe population at each time step
               'sign1' : -1,        # Nature of effect of Microbe type 2 on Microbe type 1 (choose from -1,0,1)
               'sign2' : -1,        # Nature of effect of Microbe type 1 on Microbe type 2 (choose from -1,0,1)
               'b' : 0.001,         # Bottleneck ratio - fraction of number of parent's microbes inherited by offspring
               'T' : 1000,          # Host generation time - time before next bottleneck event
-              'sim_time' : 10    # Simulation time
+              'sim_time' : 999    # Simulation time
               }
 
 gf.parameters_to_global_variables(Parameters)
