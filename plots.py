@@ -3,6 +3,13 @@ import csv
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 
+### plots csv files of data already written after simulations
+
+fileK1 = 'Data/K1.csv'  # filename of csv file of K1 dist timeseries data
+fileK2 = 'Data/K2.csv'  # filename of csv file of K2 dist timeseries data
+fileI1 = 'Data/I1.csv'  # filename of csv file of alpha1 dist timeseries data
+fileI2 = 'Data/I2.csv'  # filename of csv file of alpha2 dist timeseries data
+
 def plot_track_mean_std(filename, col, a):
 
     with open(filename) as csvfile:
@@ -49,23 +56,23 @@ a[0].grid()
 lines = [Line2D([0], [0], color='black'), Line2D([0], [0], color='black', linestyle='--'), Line2D([0], [0], color='b'), Line2D([0], [0], color='r')]
 labels = ['Mean', 'Median', 'Microbe 1', 'Microbe 2']
 a[0].legend(lines, labels)
-plot_track_mean_std('Data/K1.csv', 'b', a[0])
-plot_track_mean_std('Data/K2.csv', 'r', a[0])
+plot_track_mean_std(fileK1, 'b', a[0])
+plot_track_mean_std(fileK2, 'r', a[0])
 
 a[0].set_xlabel('Time')
 a[0].set_ylabel('Fitness value')
 a[0].set_title('Within-host evolution of K value distribution \n K1 = 500000, K2 = 100000, K1max = 1000000, K2max = 200000 \n K10/K20 = 0.2, m = 100')
 
 a[1].grid()
-plot_track_mean_std('Data/I1.csv', 'b', a[1])
-plot_track_mean_std('Data/I2.csv', 'r', a[1])
+plot_track_mean_std(fileI1, 'b', a[1])
+plot_track_mean_std(fileI2, 'r', a[1])
 a[1].set_xlabel('Time')
 a[1].set_ylabel('Alpha value')
 a[1].set_title('Within-host evolution of Alpha value distribution')
 
 a[2].grid()
-plot_track_popsize('Data/I1.csv', 'b', a[2])
-plot_track_popsize('Data/I2.csv', 'r', a[2])
+plot_track_popsize(fileI1, 'b', a[2])
+plot_track_popsize(fileI2, 'r', a[2])
 a[2].set_xlabel('Time')
 a[2].set_ylabel('Population size')
 a[2].set_title('Within-host evolution of population sizes')

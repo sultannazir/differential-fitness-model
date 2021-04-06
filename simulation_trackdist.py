@@ -27,21 +27,21 @@ Parameters = {'H' : 1,             # Number of hosts
 def run_simulation_getdist(Parameters):
     gf.parameters_to_global_variables(Parameters)
 
-    data1 = []
-    data2 = []
-    datai1 = []
-    datai2 = []
-    K1val, K2val = gf.initialize_Kval()
-    I12val, I21val = gf.initialize_Ival()
+    data1 = []  # tracks all K1 values in time in the first host (for now there is only one host)
+    data2 = []  # tracks all K2 values in time in the first host
+    datai1 = []  # tracks all alpha values of type 1 microbes in the first host
+    datai2 = []  # tracks all alpha values of type 2 microbes in the first host
+    K1val, K2val = gf.initialize_Kval()  # initial K distributions
+    I12val, I21val = gf.initialize_Ival()  # initial alpha distributions
 
     t = 1
     while t <= gf.sim_time:
         K1val, K2val, I12val, I21val = gf.update_microbes(K1val, K2val, I12val, I21val)
 
-        if t%gf.T == 0:
+        if t%gf.T == 0: # bottleneck event at every Tth time step
             K1val, K2val, I12val, I21val = gf.bottleneck(K1val, K2val, I12val, I21val)
 
-        if t%1 == 0:
+        if t%1 == 0:  # can make change here to decide window period to store data. For now it tracks every time step
 
             data1.append(K1val[0])
             data2.append(K2val[0])
@@ -53,6 +53,9 @@ def run_simulation_getdist(Parameters):
     return(data1, data2, datai1, datai2)
 
 data1, data2, datai1, datai2 = run_simulation_getdist(Parameters)
+
+# write data
+# can change data filenames here
 
 with open("Data/K1.csv", "w", newline="") as f:
     writer = csv.writer(f)
