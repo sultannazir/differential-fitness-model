@@ -173,8 +173,3 @@ def bottleneck(K1val, K2val, I12val, I21val):
         I21val[h] = [v for i, v in enumerate(I21val[h]) if i in frozenset(set(selected2))]
 
     return(K1val, K2val, I12val, I21val)
-
-selected2 = []
-K2val = [1,2,3]
-K2val = [v for i, v in enumerate(K2val) if i in frozenset(set(selected2))]
-print(K2val)

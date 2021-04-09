@@ -3,7 +3,7 @@ import csv
 import numpy as np
 from statistics import mean
 
-Parameters = {'H' : 100,             # Number of hosts: each host is an independent simulation
+Parameters = {'H' : 20,             # Number of hosts: each host is an independent simulation
               'K1' : 5000,       # Mean value of 'within-host fitness' of microbes of type 1 in the environment
               'K2' : 1000,       # Mean value of 'within-host fitness' of microbes of type 2 in the environment
               'stdK' : 500,      # Standard deviation of 'within-host fitness' of microbes in the environment
@@ -40,7 +40,7 @@ def run_simulation_getdat(Parameters):
 
     t = 1
     while t <= gf.sim_time:
-        K1val, K2val, I12val, I21val = gf.update_microbes_new(K1val, K2val, I12val, I21val)
+        K1val, K2val, I12val, I21val = gf.update_microbes(K1val, K2val, I12val, I21val)
 
         if t%gf.T == 0: # bottleneck event at every Tth time step
             data1.append(['K1', t] + [*map(mean,K1val)])
@@ -60,6 +60,6 @@ data1, data2, datai1, datai2, dataM1, dataM2 = run_simulation_getdat(Parameters)
 
 dat = np.vstack([data1, data2, datai1, datai2, dataM1, dataM2])
 
-with open("Data_manyhost.csv", "w", newline="") as f:
+with open("Data_manyhost_unmod.csv", "w", newline="") as f:
     writer = csv.writer(f)
     writer.writerows(dat)
