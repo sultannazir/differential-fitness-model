@@ -3,9 +3,9 @@ import csv
 import numpy as np
 
 Parameters = {'H' : 1,             # Number of hosts
-              'K1' : 50000,       # Mean value of 'within-host fitness' of microbes of type 1 in the environment
-              'K2' : 10000,       # Mean value of 'within-host fitness' of microbes of type 2 in the environment
-              'stdK' : 5000,      # Standard deviation of 'within-host fitness' of microbes in the environment
+              'K1' : 5000,       # Mean value of 'within-host fitness' of microbes of type 1 in the environment
+              'K2' : 1000,       # Mean value of 'within-host fitness' of microbes of type 2 in the environment
+              'stdK' : 500,      # Standard deviation of 'within-host fitness' of microbes in the environment
               'stdI' : 1,          # Standard deviation of 'within-host interaction coefficients'...
                                    # of microbes in the environment
               'env_rat1' : 0.2,    # Relative abundance of type 1 microbes in the environment = K1'/(K1' + K2')
@@ -19,9 +19,9 @@ Parameters = {'H' : 1,             # Number of hosts
               'm' : 100,           # Size of colonizing microbe population at each time step
               'sign1' : -1,        # Nature of effect of Microbe type 2 on Microbe type 1 (choose from -1,0,1)
               'sign2' : -1,        # Nature of effect of Microbe type 1 on Microbe type 2 (choose from -1,0,1)
-              'b' : 0.001,         # Bottleneck ratio - fraction of number of parent's microbes inherited by offspring
-              'T' : 1000,          # Host generation time - time before next bottleneck event
-              'sim_time' : 999    # Simulation time
+              'b' : 0.1,         # Bottleneck ratio - fraction of number of parent's microbes inherited by offspring
+              'T' : 500,          # Host generation time - time before next bottleneck event
+              'sim_time' : 9999    # Simulation time
               }
 
 def run_simulation_getdist(Parameters):
@@ -36,18 +36,16 @@ def run_simulation_getdist(Parameters):
 
     t = 1
     while t <= gf.sim_time:
-        K1val, K2val, I12val, I21val = gf.update_microbes(K1val, K2val, I12val, I21val)
+        K1val, K2val, I12val, I21val = gf.update_microbes_new(K1val, K2val, I12val, I21val)
 
         if t%gf.T == 0: # bottleneck event at every Tth time step
             K1val, K2val, I12val, I21val = gf.bottleneck(K1val, K2val, I12val, I21val)
 
-        if t%1 == 0:  # can make change here to decide window period to store data. For now it tracks every time step
-
-            data1.append(K1val[0])
-            data2.append(K2val[0])
-            datai1.append(I12val[0])
-            datai2.append(I21val[0])
-            print(t)
+        data1.append(K1val[0])
+        data2.append(K2val[0])
+        datai1.append(I12val[0])
+        datai2.append(I21val[0])
+        print(t)
         t += 1
 
     return(data1, data2, datai1, datai2)

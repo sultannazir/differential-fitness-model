@@ -39,7 +39,6 @@ def death(Kvals, Iijvals):
     num_mic = len(Kvals)
     probs = np.random.random(num_mic)
     selected = [i for i in range(len(Kvals)) if probs[i] < d] # select microbes to die
-
     Kvals = [v for i,v in enumerate(Kvals) if i not in frozenset(set(selected))]
     # redifine microbe values excluding dead microbes
     Iijvals = [v for i, v in enumerate(Iijvals) if i not in frozenset(set(selected))]
@@ -117,19 +116,65 @@ def update_microbes(K1val, K2val, I12val, I21val):
 
     return(K1val, K2val, I12val, I21val)
 
+def calc_propensity(K1val, K2val,M1, M2, I12val, I21val):
+
+    prop1 = w*(1 - M1/np.array(K1val)) - d + sign1*np.array(I12val)*M2/(M1+M2)
+    prop2 = w * (1 - M2 / np.array(K2val)) - d + sign2 * np.array(I21val) * M1 / (M1+M2)
+
+    return(prop1, prop2)
+
+def update_microbes_new(K1val, K2val, I12val, I21val):
+
+    for h in range(len(K1val)):
+
+        # colonization
+        K1val[h], K2val[h], I12val[h], I21val[h] = colonize(K1val[h], K2val[h], I12val[h], I21val[h])
+
+        M1 = len(K1val[h])
+        M2 = len(K2val[h])
+        prop1, prop2 = calc_propensity(K1val[h], K2val[h], M1, M2, I12val[h], I21val[h])
+        probs1 = np.random.random(M1)
+        probs2 = np.random.random(M2)
+
+        selected_die1 = [i for i in range(M1) if -prop1[i] > probs1[i]]
+        selected_die2 = [i for i in range(M2) if -prop2[i] > probs2[i]]
+        selected_bir1 = [i for i in range(M1) if prop1[i] > probs1[i]]
+        selected_bir2 = [i for i in range(M2) if prop2[i] > probs2[i]]
+
+        #birth
+        K1val[h] += [K1val[h][i] for i in selected_bir1]
+        I12val[h] += [I12val[h][i] for i in selected_bir1]
+        K2val[h] += [K2val[h][i] for i in selected_bir2]
+        I21val[h] += [I21val[h][i] for i in selected_bir2]
+
+        #death
+        K1val[h] = [v for i, v in enumerate(K1val[h]) if i not in frozenset(set(selected_die1))]
+        I12val[h] = [v for i, v in enumerate(I12val[h]) if i not in frozenset(set(selected_die1))]
+        K2val[h] = [v for i, v in enumerate(K2val[h]) if i not in frozenset(set(selected_die2))]
+        I21val[h] = [v for i, v in enumerate(I21val[h]) if i not in frozenset(set(selected_die2))]
+
+    return (K1val, K2val, I12val, I21val)
+
 def bottleneck(K1val, K2val, I12val, I21val):
 
-    N = int(np.ceil(b*(len(K1val) + len(K2val))))  # total number of microbes transmitted vertically
-    n1 = int(np.random.binomial(N, len(K1val)/(len(K1val) + len(K2val))))  # number of type 1 microbes
-    n2 = N - n1  # number of type 2 microbes
+    for h in range(len(K1val)):
 
-    # select microbes from parent microbiome
-    selected1 = random.sample(range(0, len(K1val)), n1)
-    selected2 = random.sample(range(0, len(K2val)), n2)
+        N = int(np.ceil(b*(len(K1val[h]) + len(K2val[h]))))  # total number of microbes transmitted vertically
+        n1 = int(np.random.binomial(N, len(K1val[h])/(len(K1val[h]) + len(K2val[h]))))  # number of type 1 microbes
+        n2 = N - n1  # number of type 2 microbes
 
-    K1val = [v for i, v in enumerate(K1val) if i in frozenset(set(selected1))]
-    I12val = [v for i, v in enumerate(I12val) if i in frozenset(set(selected1))]
-    K2val = [v for i, v in enumerate(K2val) if i in frozenset(set(selected2))]
-    I21val = [v for i, v in enumerate(I21val) if i in frozenset(set(selected2))]
+        # select microbes from parent microbiome
+        selected1 = random.sample(range(0, len(K1val[h])), n1)
+        selected2 = random.sample(range(0, len(K2val[h])), n2)
+
+        K1val[h] = [v for i, v in enumerate(K1val[h]) if i in frozenset(set(selected1))]
+        I12val[h] = [v for i, v in enumerate(I12val[h]) if i in frozenset(set(selected1))]
+        K2val[h] = [v for i, v in enumerate(K2val[h]) if i in frozenset(set(selected2))]
+        I21val[h] = [v for i, v in enumerate(I21val[h]) if i in frozenset(set(selected2))]
 
     return(K1val, K2val, I12val, I21val)
+
+selected2 = []
+K2val = [1,2,3]
+K2val = [v for i, v in enumerate(K2val) if i in frozenset(set(selected2))]
+print(K2val)
