@@ -19,7 +19,7 @@ Parameters = {'H' : 1,             # Number of hosts
               'm' : 100,           # Size of colonizing microbe population at each time step
               'sign1' : -1,        # Nature of effect of Microbe type 2 on Microbe type 1 (choose from -1,0,1)
               'sign2' : -1,        # Nature of effect of Microbe type 1 on Microbe type 2 (choose from -1,0,1)
-              'b' : 0.1,         # Bottleneck ratio - fraction of number of parent's microbes inherited by offspring
+              'b' : 0.05,         # Bottleneck ratio - fraction of number of parent's microbes inherited by offspring
               'T' : 500,          # Host generation time - time before next bottleneck event
               'sim_time' : 9999    # Simulation time
               }
@@ -36,7 +36,7 @@ def run_simulation_getdist(Parameters):
 
     t = 1
     while t <= gf.sim_time:
-        K1val, K2val, I12val, I21val = gf.update_microbes_new(K1val, K2val, I12val, I21val)
+        K1val, K2val, I12val, I21val = gf.update_microbes(K1val, K2val, I12val, I21val)
 
         if t%gf.T == 0: # bottleneck event at every Tth time step
             K1val, K2val, I12val, I21val = gf.bottleneck(K1val, K2val, I12val, I21val)

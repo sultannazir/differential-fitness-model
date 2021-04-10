@@ -61,7 +61,7 @@ plot_track_mean_std(fileK2, 'r', a[0])
 
 a[0].set_xlabel('Time')
 a[0].set_ylabel('Fitness value')
-a[0].set_title('Within-host evolution of K value distribution \n K1 = 5000, K2 = 1000, K1max = inf, K2max = inf \n K10/K20 = 0.25, m = 100')
+a[0].set_title('Within-host evolution of K value distribution \n K1 = 5000, K2 = 1000, K1max = inf, K2max = inf \n K10/K20 = 0.25, m = 100, b = 0.05, T = 500')
 
 a[1].grid()
 plot_track_mean_std(fileI1, 'b', a[1])
