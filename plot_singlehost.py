@@ -33,7 +33,7 @@ def plot_track_mean_std(filename, col, a):
 
     x = np.array([i for i in range(len(meanline))])
 
-    a.plot(x, meanline, linewidth=2, color = col)
+    a.plot(x, meanline, linewidth=2, color = col, alpha = 0.5)
     a.plot(x, medline, linewidth=1, color = col, linestyle='dashed')
     a.fill_between(x, underline, overline, color = col, alpha = 0.1)
 
@@ -61,7 +61,7 @@ plot_track_mean_std(fileK2, 'r', a[0])
 
 a[0].set_xlabel('Time')
 a[0].set_ylabel('Fitness value')
-a[0].set_title('Within-host evolution of K value distribution \n K1 = 5000, K2 = 1000, K1max = inf, K2max = inf \n K10/K20 = 0.25, m = 100, b = 0.05, T = 500')
+a[0].set_title('Within-host evolution of K value distribution \n K1 = 5000, K2 = 1000, stdK1 = 100, stdK2 = 1000 \n K10/K20 = 0.001, m = 1000, b = 0.05, T = 500')
 
 a[1].grid()
 plot_track_mean_std(fileI1, 'b', a[1])

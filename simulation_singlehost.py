@@ -8,7 +8,7 @@ Parameters = {'H' : 1,             # Number of hosts
               'stdK' : 500,      # Standard deviation of 'within-host fitness' of microbes in the environment
               'stdI' : 1,          # Standard deviation of 'within-host interaction coefficients'...
                                    # of microbes in the environment
-              'env_rat1' : 0.2,    # Relative abundance of type 1 microbes in the environment = K1'/(K1' + K2')
+              'env_rat1' : 0.001,    # Relative abundance of type 1 microbes in the environment = K1'/(K1' + K2')
               'init_size' : 100,   # Initial population size of each microbe type in the host(s)
               'K_min' : 100,       # Minimum value of within-host fitness any microbe can attain
               'K1_max' : np.inf,  # Maximum value of within-host fitness type 1 microbes can attain
@@ -16,12 +16,12 @@ Parameters = {'H' : 1,             # Number of hosts
               'd' : 0.01,          # Probability of death of a microbe in host at each time step
               'w' : 0.5,           # Relative effect of intraspecific interactions to interspecific interactions in
                                    # birth and death of a microbe
-              'm' : 100,           # Size of colonizing microbe population at each time step
+              'm' : 1000,           # Size of colonizing microbe population at each time step
               'sign1' : -1,        # Nature of effect of Microbe type 2 on Microbe type 1 (choose from -1,0,1)
               'sign2' : -1,        # Nature of effect of Microbe type 1 on Microbe type 2 (choose from -1,0,1)
               'b' : 0.05,         # Bottleneck ratio - fraction of number of parent's microbes inherited by offspring
               'T' : 500,          # Host generation time - time before next bottleneck event
-              'sim_time' : 9999    # Simulation time
+              'sim_time' : 10000    # Simulation time
               }
 
 def run_simulation_getdist(Parameters):
@@ -36,7 +36,7 @@ def run_simulation_getdist(Parameters):
 
     t = 1
     while t <= gf.sim_time:
-        K1val, K2val, I12val, I21val = gf.update_microbes(K1val, K2val, I12val, I21val)
+        K1val, K2val, I12val, I21val = gf.update_microbes_new(K1val, K2val, I12val, I21val)
 
         if t%gf.T == 0: # bottleneck event at every Tth time step
             K1val, K2val, I12val, I21val = gf.bottleneck(K1val, K2val, I12val, I21val)

@@ -2,11 +2,13 @@ import general_functions as gf
 import csv
 import numpy as np
 from statistics import mean
+import itertools
 
-Parameters = {'H' : 20,             # Number of hosts: each host is an independent simulation
+Parameters = {'H' : 15,             # Number of hosts: each host is an independent simulation
               'K1' : 5000,       # Mean value of 'within-host fitness' of microbes of type 1 in the environment
               'K2' : 1000,       # Mean value of 'within-host fitness' of microbes of type 2 in the environment
-              'stdK' : 500,      # Standard deviation of 'within-host fitness' of microbes in the environment
+              'stdK1' : 100,      # Standard deviation of 'within-host fitness' of microbes in the environment
+              'stdK2' : 1000,
               'stdI' : 1,          # Standard deviation of 'within-host interaction coefficients'...
                                    # of microbes in the environment
               'env_rat1' : 0.1,    # Relative abundance of type 1 microbes in the environment = K1'/(K1' + K2')
@@ -40,7 +42,7 @@ def run_simulation_getdat(Parameters):
 
     t = 1
     while t <= gf.sim_time:
-        K1val, K2val, I12val, I21val = gf.update_microbes(K1val, K2val, I12val, I21val)
+        K1val, K2val, I12val, I21val = gf.update_microbes_new(K1val, K2val, I12val, I21val)
 
         if t%gf.T == 0: # bottleneck event at every Tth time step
             data1.append(['K1', t] + [*map(mean,K1val)])
@@ -56,10 +58,48 @@ def run_simulation_getdat(Parameters):
 
     return(data1, data2, datai1, datai2, dataM1, dataM2)
 
-data1, data2, datai1, datai2, dataM1, dataM2 = run_simulation_getdat(Parameters)
+def run_simulation_finalstate(Parameters):
+    gf.parameters_to_global_variables(Parameters)
 
-dat = np.vstack([data1, data2, datai1, datai2, dataM1, dataM2])
+    K1val, K2val = gf.initialize_Kval()  # initial K distributions
+    I12val, I21val = gf.initialize_Ival()  # initial alpha distributions
 
-with open("Data_manyhost_unmod.csv", "w", newline="") as f:
-    writer = csv.writer(f)
-    writer.writerows(dat)
+    t = 1
+    while t <= gf.sim_time:
+        K1val, K2val, I12val, I21val = gf.update_microbes_new(K1val, K2val, I12val, I21val)
+
+        if t % gf.T == 0:  # bottleneck event at every Tth time step
+            K1val, K2val, I12val, I21val = gf.bottleneck(K1val, K2val, I12val, I21val)
+
+        t += 1
+
+    K1all = list(itertools.chain.from_iterable(K1val))
+    K1mean, K1med, K1std = np.mean(K1all), np.median(K1all), np.std(K1all)
+    K2all = list(itertools.chain.from_iterable(K2val))
+    K2mean, K2med, K2std = np.mean(K2all), np.median(K2all), np.std(K2all)
+    I1all = list(itertools.chain.from_iterable(I12val))
+    I1mean, I1med, I1std = np.mean(I1all), np.median(I1all), np.std(I1all)
+    I2all = list(itertools.chain.from_iterable(I21val))
+    I2mean, I2med, I2std = np.mean(I2all), np.median(I2all), np.std(I2all)
+
+    M1all = [*map(len, K1val)]
+    M2all = [*map(len, K2val)]
+    M1mean, M1med, M1std = np.mean(M1all), np.median(M1all), np.std(M1all)
+    M2mean, M2med, M2std = np.mean(M2all), np.median(M2all), np.std(M2all)
+
+    OPmean = ['mean', gf.stdK2, gf.m, gf.env_rat1, K1mean, K2mean, I1mean, I2mean, M1mean, M2mean]
+    OPmed = ['med', gf.stdK2, gf.m, gf.env_rat1, K1med, K2med, I1med, I2med, M1med, M2med]
+    OPstd = ['std', gf.stdK2, gf.m, gf.env_rat1, K1std, K2std, I1std, I2std, M1std, M2std]
+    return(OPmean, OPmed, OPstd)
+
+#iter = 4
+#results = [pool.apply(run_simulation_getdat, args=(Parameters)) for i in range(iter)]
+#pool.close()
+
+#data1, data2, datai1, datai2, dataM1, dataM2 = run_simulation_getdat(Parameters)
+
+#dat = np.vstack([data1, data2, datai1, datai2, dataM1, dataM2])
+
+#with open("Data_manyhost_sel2_nom.csv", "w", newline="") as f:
+#    writer = csv.writer(f)
+#    writer.writerows(dat)
