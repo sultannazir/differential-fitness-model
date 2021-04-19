@@ -5,23 +5,26 @@ import numpy as np
 Parameters = {'H' : 1,             # Number of hosts
               'K1' : 5000,       # Mean value of 'within-host fitness' of microbes of type 1 in the environment
               'K2' : 1000,       # Mean value of 'within-host fitness' of microbes of type 2 in the environment
-              'stdK' : 500,      # Standard deviation of 'within-host fitness' of microbes in the environment
+              'stdK1' : 500,      # Standard deviation of 'within-host fitness' of microbes in the environment
+              'stdK2' : 500,
               'stdI' : 1,          # Standard deviation of 'within-host interaction coefficients'...
                                    # of microbes in the environment
-              'env_rat1' : 0.001,    # Relative abundance of type 1 microbes in the environment = K1'/(K1' + K2')
+              'env_rat1' : 0.1,    # Relative abundance of type 1 microbes in the environment = K1'/(K1' + K2')
               'init_size' : 100,   # Initial population size of each microbe type in the host(s)
               'K_min' : 100,       # Minimum value of within-host fitness any microbe can attain
-              'K1_max' : np.inf,  # Maximum value of within-host fitness type 1 microbes can attain
-              'K2_max' : np.inf,   # Maximum value of within-host fitness type 2 microbes can attain
-              'd' : 0.01,          # Probability of death of a microbe in host at each time step
+              'K1_max' : 10000,  # Maximum value of within-host fitness type 1 microbes can attain
+              'K2_max' : 10000,   # Maximum value of within-host fitness type 2 microbes can attain
+              'muK' : 10,
+              'muI' : 0.01,
+              'd' : 0.0,          # Probability of death of a microbe in host at each time step
               'w' : 0.5,           # Relative effect of intraspecific interactions to interspecific interactions in
                                    # birth and death of a microbe
-              'm' : 1000,           # Size of colonizing microbe population at each time step
+              'm' : 500,           # Size of colonizing microbe population at each time step
               'sign1' : -1,        # Nature of effect of Microbe type 2 on Microbe type 1 (choose from -1,0,1)
-              'sign2' : -1,        # Nature of effect of Microbe type 1 on Microbe type 2 (choose from -1,0,1)
+              'sign2' : 1,        # Nature of effect of Microbe type 1 on Microbe type 2 (choose from -1,0,1)
               'b' : 0.05,         # Bottleneck ratio - fraction of number of parent's microbes inherited by offspring
-              'T' : 500,          # Host generation time - time before next bottleneck event
-              'sim_time' : 10000    # Simulation time
+              'T' : 200,          # Host generation time - time before next bottleneck event
+              'sim_time' : 1000    # Simulation time
               }
 
 def run_simulation_getdist(Parameters):

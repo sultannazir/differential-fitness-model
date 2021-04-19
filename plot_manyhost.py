@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import seaborn as sns
 
-file = 'Data_manyhost_sel2_nom.csv'
+file = 'Data_manyhost_new.csv'
 
 with open(file) as csvfile:
     rows = csv.reader(csvfile)

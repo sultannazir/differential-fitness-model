@@ -7,16 +7,17 @@ import itertools
 Parameters = {'H' : 15,             # Number of hosts: each host is an independent simulation
               'K1' : 5000,       # Mean value of 'within-host fitness' of microbes of type 1 in the environment
               'K2' : 1000,       # Mean value of 'within-host fitness' of microbes of type 2 in the environment
-              'stdK1' : 100,      # Standard deviation of 'within-host fitness' of microbes in the environment
-              'stdK2' : 1000,
+              'stdK1' : 500,      # Standard deviation of 'within-host fitness' of microbes in the environment
+              'stdK2' : 500,
               'stdI' : 1,          # Standard deviation of 'within-host interaction coefficients'...
                                    # of microbes in the environment
               'env_rat1' : 0.1,    # Relative abundance of type 1 microbes in the environment = K1'/(K1' + K2')
               'init_size' : 100,   # Initial population size of each microbe type in the host(s)
               'K_min' : 100,       # Minimum value of within-host fitness any microbe can attain
-              'K1_max' : np.inf,  # Maximum value of within-host fitness type 1 microbes can attain
-              'K2_max' : np.inf,   # Maximum value of within-host fitness type 2 microbes can attain
-              'd' : 0.01,          # Probability of death of a microbe in host at each time step
+              'K1_max' : 10000,  # Maximum value of within-host fitness type 1 microbes can attain
+              'K2_max' : 10000,   # Maximum value of within-host fitness type 2 microbes can attain
+              'mu' : 10,
+              'd' : 0.0,          # Probability of death of a microbe in host at each time step
               'w' : 0.5,           # Relative effect of intraspecific interactions to interspecific interactions in
                                    # birth and death of a microbe
               'm' : 100,           # Size of colonizing microbe population at each time step
@@ -41,7 +42,7 @@ def run_simulation_getdat(Parameters):
     I12val, I21val = gf.initialize_Ival()  # initial alpha distributions
 
     t = 1
-    while t <= gf.sim_time:
+    while t <= gf.gf.num_gen*gf.T:
         K1val, K2val, I12val, I21val = gf.update_microbes_new(K1val, K2val, I12val, I21val)
 
         if t%gf.T == 0: # bottleneck event at every Tth time step
@@ -65,7 +66,7 @@ def run_simulation_finalstate(Parameters):
     I12val, I21val = gf.initialize_Ival()  # initial alpha distributions
 
     t = 1
-    while t <= gf.sim_time:
+    while t <= gf.num_gen*gf.T-1:
         K1val, K2val, I12val, I21val = gf.update_microbes_new(K1val, K2val, I12val, I21val)
 
         if t % gf.T == 0:  # bottleneck event at every Tth time step
@@ -87,19 +88,16 @@ def run_simulation_finalstate(Parameters):
     M1mean, M1med, M1std = np.mean(M1all), np.median(M1all), np.std(M1all)
     M2mean, M2med, M2std = np.mean(M2all), np.median(M2all), np.std(M2all)
 
-    OPmean = ['mean', gf.stdK2, gf.m, gf.env_rat1, K1mean, K2mean, I1mean, I2mean, M1mean, M2mean]
-    OPmed = ['med', gf.stdK2, gf.m, gf.env_rat1, K1med, K2med, I1med, I2med, M1med, M2med]
-    OPstd = ['std', gf.stdK2, gf.m, gf.env_rat1, K1std, K2std, I1std, I2std, M1std, M2std]
+    OPmean = ['mean', gf.b, gf.m, gf.T, K1mean, K2mean, I1mean, I2mean, M1mean, M2mean]
+    OPmed = ['med', gf.b, gf.m, gf.T, K1med, K2med, I1med, I2med, M1med, M2med]
+    OPstd = ['std', gf.b, gf.m, gf.T, K1std, K2std, I1std, I2std, M1std, M2std]
     return(OPmean, OPmed, OPstd)
 
-#iter = 4
-#results = [pool.apply(run_simulation_getdat, args=(Parameters)) for i in range(iter)]
-#pool.close()
 
 #data1, data2, datai1, datai2, dataM1, dataM2 = run_simulation_getdat(Parameters)
 
 #dat = np.vstack([data1, data2, datai1, datai2, dataM1, dataM2])
 
-#with open("Data_manyhost_sel2_nom.csv", "w", newline="") as f:
+#with open("Data_manyhost_new.csv", "w", newline="") as f:
 #    writer = csv.writer(f)
 #    writer.writerows(dat)

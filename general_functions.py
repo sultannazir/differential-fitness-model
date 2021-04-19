@@ -118,8 +118,8 @@ def update_microbes(K1val, K2val, I12val, I21val):
 
 def calc_propensity(K1val, K2val,M1, M2, I12val, I21val):
 
-    prop1 = w*(1 - M1/np.array(K1val)) - d + sign1*np.array(I12val)*M2/(M1+M2)
-    prop2 = w * (1 - M2 / np.array(K2val)) - d + sign2 * np.array(I21val) * M1 / (M1+M2)
+    prop1 = w*(1 - M1/np.array(K1val)) + sign1*np.array(I12val)*M2/(M1+M2)
+    prop2 = w * (1 - M2 / np.array(K2val)) + sign2 * np.array(I21val) * M1 / (M1+M2)
 
     return(prop1, prop2)
 
@@ -141,11 +141,11 @@ def update_microbes_new(K1val, K2val, I12val, I21val):
         selected_bir1 = [i for i in range(M1) if prop1[i] > probs1[i]]
         selected_bir2 = [i for i in range(M2) if prop2[i] > probs2[i]]
 
-        #birth
-        K1val[h] += [K1val[h][i] for i in selected_bir1]
-        I12val[h] += [I12val[h][i] for i in selected_bir1]
-        K2val[h] += [K2val[h][i] for i in selected_bir2]
-        I21val[h] += [I21val[h][i] for i in selected_bir2]
+        #birth with mutation with physiological bounds
+        K1val[h] += [np.clip(K1val[h][i] + random.normalvariate(0,muK), a_min=K_min, a_max=K1_max) for i in selected_bir1]
+        I12val[h] += [np.clip(I12val[h][i] + random.normalvariate(0,muI), a_min=0, a_max=1) for i in selected_bir1]
+        K2val[h] += [np.clip(K2val[h][i] + random.normalvariate(0,muK), a_min=K_min, a_max=K2_max) for i in selected_bir2]
+        I21val[h] += [np.clip(I21val[h][i] + random.normalvariate(0,muI), a_min=0, a_max=1) for i in selected_bir2]
 
         #death
         K1val[h] = [v for i, v in enumerate(K1val[h]) if i not in frozenset(set(selected_die1))]
