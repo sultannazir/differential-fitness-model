@@ -2,6 +2,7 @@ import numpy as np
 import csv
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+import seaborn as sns
 from matplotlib.lines import Line2D
 
 ### plots csv files of data already written after simulations
@@ -26,6 +27,32 @@ def plot_dist(filename, a, bins):
     hist= np.flip(np.array(hist),1)
     print(hist)
     im = a.imshow(hist.T, cmap='Greys', aspect='auto')
+    ticks = [0,4,8,12,16]
+    a.set_yticks(ticks)
+    a.set_yticklabels([np.flip(np.around(bins, decimals=2))[i] for i in ticks])
+    divider = make_axes_locatable(a)
+    cax = divider.append_axes('right', size='5%', pad=0.05)
+    fig.colorbar(im, cax=cax, orientation='vertical')
+
+def plot_dist_withline(filename, a, bins):
+    with open(filename) as csvfile:
+        rows = csv.reader(csvfile)
+        dat = list(rows)
+
+    hist = []
+    line = []
+    it = 0
+    for i in dat:
+        i = [float(j) for j in i]
+        hist.append(np.log10(1 + np.histogram(i, bins)[0]).tolist())
+        if it%1==0:
+         line = line + [20-len(i)/500]
+        it+=1
+    hist= np.flip(np.array(hist),1)
+    print(hist, line)
+    im = a.imshow(hist.T, cmap='Greys', aspect='auto')
+    a.plot(line)
+
     ticks = [0,4,8,12,16]
     a.set_yticks(ticks)
     a.set_yticklabels([np.flip(np.around(bins, decimals=2))[i] for i in ticks])
@@ -79,13 +106,13 @@ fig, a = plt.subplots(2,2, figsize=(9,5))
 #lines = [Line2D([0], [0], color='black'), Line2D([0], [0], color='black', linestyle='--'), Line2D([0], [0], color='b'), Line2D([0], [0], color='r')]
 #labels = ['Mean', 'Median', 'Microbe 1', 'Microbe 2']
 #a[0].legend(lines, labels)
-plot_dist(fileK1, a[0][0], binsK)
+plot_dist_withline(fileK1, a[0][0], binsK)
 
 a[0][0].set_xlabel('Time')
 a[0][0].set_ylabel('K1 value')
 #a[0].set_title('Within-host evolution of K value distribution \n K1 = 5000, K2 = 1000, stdK = 500, muK = 10, muI = 0.01\n K10/K20 = 1/9, m = 500, b = 0.05, T = 500')
 
-plot_dist(fileK2, a[0][1], binsK)
+plot_dist_withline(fileK2, a[0][1], binsK)
 
 a[0][1].set_xlabel('Time')
 a[0][1].set_ylabel('K2 value')
@@ -113,8 +140,8 @@ a[1][1].set_ylabel('Alpha2 value')
 #a[2].set_ylabel('Population size')
 #a[2].set_title('Within-host evolution of population sizes')
 
-plt.suptitle('Frequency distribution of evolvable parameters in a single host (in log10) \n with vertical (T=200, b=0.05) and horizontal drift (m=500)'
-             '\n K1 = 5000, K2 = 1000, stdK = 500, K1max = K2max = 10000, muK = 10, muI = 0.01, K10/K20 = 1/9')
+plt.suptitle('Frequency distribution of evolving parameters in a single host (in log10)'
+             '\n m = 10000, K10/K20 = 1/9, T = 500')
 
 plt.tight_layout()
 plt.show()

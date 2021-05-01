@@ -1,9 +1,10 @@
 import numpy as np
 from scipy import stats
 import random
+import csv
 
 def parameters_to_global_variables(Parameters):
-# reads input parameters from dictionary and assigns them as global variables with variable names same as the dict keys
+# reads input parameters from dictionary and assigns them as global variables with variablels  names same as the dict keys
     keys = list(Parameters.keys())
     for i in keys:
         globals()[i] = Parameters[i]
@@ -141,11 +142,11 @@ def update_microbes_new(K1val, K2val, I12val, I21val):
         selected_bir1 = [i for i in range(M1) if prop1[i] > probs1[i]]
         selected_bir2 = [i for i in range(M2) if prop2[i] > probs2[i]]
 
-        #birth with mutation with physiological bounds
-        K1val[h] += [np.clip(K1val[h][i] + random.normalvariate(0,muK), a_min=K_min, a_max=K1_max) for i in selected_bir1]
-        I12val[h] += [np.clip(I12val[h][i] + random.normalvariate(0,muI), a_min=0, a_max=1) for i in selected_bir1]
-        K2val[h] += [np.clip(K2val[h][i] + random.normalvariate(0,muK), a_min=K_min, a_max=K2_max) for i in selected_bir2]
-        I21val[h] += [np.clip(I21val[h][i] + random.normalvariate(0,muI), a_min=0, a_max=1) for i in selected_bir2]
+        #birth with mutation within physiological bounds
+        K1val[h] += [int(np.clip(K1val[h][i] + random.normalvariate(0,muK), a_min=K_min, a_max=K1_max)) for i in selected_bir1]
+        I12val[h] += [round(float(np.clip(I12val[h][i] + random.normalvariate(0,muI), a_min=0, a_max=1)),3) for i in selected_bir1]
+        K2val[h] += [int(np.clip(K2val[h][i] + random.normalvariate(0,muK), a_min=K_min, a_max=K2_max)) for i in selected_bir2]
+        I21val[h] += [round(float(np.clip(I21val[h][i] + random.normalvariate(0,muI), a_min=0, a_max=1)),3) for i in selected_bir2]
 
         #death
         K1val[h] = [v for i, v in enumerate(K1val[h]) if i not in frozenset(set(selected_die1))]
@@ -160,12 +161,12 @@ def bottleneck(K1val, K2val, I12val, I21val):
     for h in range(len(K1val)):
 
         N = int(np.ceil(b*(len(K1val[h]) + len(K2val[h]))))  # total number of microbes transmitted vertically
-        n1 = int(np.random.binomial(N, len(K1val[h])/(len(K1val[h]) + len(K2val[h]))))  # number of type 1 microbes
-        n2 = N - n1  # number of type 2 microbes
+        n1 = np.clip(int(np.random.binomial(N, len(K1val[h])/(len(K1val[h]) + len(K2val[h])))), a_min=0, a_max=len(K1val[h]))  # number of type 1 microbes
+        n2 = np.clip(N - n1, a_min=0, a_max=len(K2val[h]))  # number of type 2 microbes
 
         # select microbes from parent microbiome
-        selected1 = random.sample(range(0, len(K1val[h])), n1)
-        selected2 = random.sample(range(0, len(K2val[h])), n2)
+        selected1 = random.sample(range(len(K1val[h])), n1)
+        selected2 = random.sample(range(len(K2val[h])), n2)
 
         K1val[h] = [v for i, v in enumerate(K1val[h]) if i in frozenset(set(selected1))]
         I12val[h] = [v for i, v in enumerate(I12val[h]) if i in frozenset(set(selected1))]
