@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import general_functions as gf
 
-data_folder = Path("Data_ParStudy/")
-dataName = "data_HV_inv.csv"
+data_folder = Path("par_study/")
+dataName = "data_mT_col2.csv"
 
 Parameters = {'H' : 1,             # Number of hosts: each host is an independent simulation
               'K1' : 5000,       # Mean value of 'within-host fitness' of microbes of type 1 in the environment
@@ -59,8 +59,9 @@ def run_simulation_finalstate(Parameters):
     K1val, K2val = gf.initialize_Kval()  # initial K distributions
     I12val, I21val = gf.initialize_Ival()  # initial alpha distributions
 
+    time = gf.sim_time + gf.T - gf.sim_time%gf.T
     t = 1
-    while t <= gf.sim_time:
+    while t <= time:
         K1val, K2val, I12val, I21val = gf.update_microbes_new(K1val, K2val, I12val, I21val)
 
         if t % gf.T == 0:  # bottleneck event at every Tth time step

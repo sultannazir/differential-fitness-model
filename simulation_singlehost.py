@@ -9,7 +9,7 @@ Parameters = {'H' : 1,             # Number of hosts
               'stdK2' : 500,
               'stdI' : 1,          # Standard deviation of 'within-host interaction coefficients'...
                                    # of microbes in the environment
-              'env_rat1' : 0.9,    # Relative abundance of type 1 microbes in the environment = K1'/(K1' + K2')
+              'env_rat1' : 0.1,    # Relative abundance of type 1 microbes in the environment = K1'/(K1' + K2')
               'init_size' : 100,   # Initial population size of each microbe type in the host(s)
               'K_min' : 100,       # Minimum value of within-host fitness any microbe can attain
               'K1_max' : 10000,  # Maximum value of within-host fitness type 1 microbes can attain
@@ -19,7 +19,7 @@ Parameters = {'H' : 1,             # Number of hosts
               'd' : 0.0,          # Probability of death of a microbe in host at each time step
               'w' : 0.5,           # Relative effect of intraspecific interactions to interspecific interactions in
                                    # birth and death of a microbe
-              'm' : 5000,           # Size of colonizing microbe population at each time step
+              'm' : 1581,           # Size of colonizing microbe population at each time step
               'sign1' : -1,        # Nature of effect of Microbe type 2 on Microbe type 1 (choose from -1,0,1)
               'sign2' : -1,        # Nature of effect of Microbe type 1 on Microbe type 2 (choose from -1,0,1)
               'b' : 0.01,         # Bottleneck ratio - fraction of number of parent's microbes inherited by offspring

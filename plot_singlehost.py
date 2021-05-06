@@ -141,7 +141,7 @@ a[1][1].set_ylabel('Alpha2 value')
 #a[2].set_title('Within-host evolution of population sizes')
 
 plt.suptitle('Frequency distribution of evolving parameters in a single host (in log10)'
-             '\n m = 10000, K10/K20 = 1/9, T = 500')
+             '\n m = 1581, K10/K20 = 9, T = 12')
 
 plt.tight_layout()
 plt.show()
