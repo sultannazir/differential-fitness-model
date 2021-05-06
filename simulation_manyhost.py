@@ -20,7 +20,7 @@ Parameters = {'H' : 15,             # Number of hosts: each host is an independe
               'd' : 0.0,          # Probability of death of a microbe in host at each time step
               'w' : 0.5,           # Relative effect of intraspecific interactions to interspecific interactions in
                                    # birth and death of a microbe
-              'm' : 100,           # Size of colonizing microbe population at each time step
+              'm' : 1000,           # Size of colonizing microbe population at each time step
               'sign1' : -1,        # Nature of effect of Microbe type 2 on Microbe type 1 (choose from -1,0,1)
               'sign2' : -1,        # Nature of effect of Microbe type 1 on Microbe type 2 (choose from -1,0,1)
               'b' : 0.05,         # Bottleneck ratio - fraction of number of parent's microbes inherited by offspring
@@ -42,7 +42,7 @@ def run_simulation_getdat(Parameters):
     I12val, I21val = gf.initialize_Ival()  # initial alpha distributions
 
     t = 1
-    while t <= gf.gf.num_gen*gf.T:
+    while t <= gf.sim_time:
         K1val, K2val, I12val, I21val = gf.update_microbes_new(K1val, K2val, I12val, I21val)
 
         if t%gf.T == 0: # bottleneck event at every Tth time step
@@ -66,7 +66,7 @@ def run_simulation_finalstate(Parameters):
     I12val, I21val = gf.initialize_Ival()  # initial alpha distributions
 
     t = 1
-    while t <= gf.num_gen*gf.T-1:
+    while t <= gf.sim_time:
         K1val, K2val, I12val, I21val = gf.update_microbes_new(K1val, K2val, I12val, I21val)
 
         if t % gf.T == 0:  # bottleneck event at every Tth time step
@@ -91,6 +91,7 @@ def run_simulation_finalstate(Parameters):
     OPmean = ['mean', gf.b, gf.m, gf.T, K1mean, K2mean, I1mean, I2mean, M1mean, M2mean]
     OPmed = ['med', gf.b, gf.m, gf.T, K1med, K2med, I1med, I2med, M1med, M2med]
     OPstd = ['std', gf.b, gf.m, gf.T, K1std, K2std, I1std, I2std, M1std, M2std]
+    print('b: {} , m: {} , T: {} complete'.format(gf.b, gf.m, gf.T))
     return(OPmean, OPmed, OPstd)
 
 
