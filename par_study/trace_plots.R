@@ -1,5 +1,7 @@
+install.packages("reshape")
+
 library(ggplot2)
-library(reshape2)
+library(reshape)
 library(dplyr)
 library(ggh4x)
 library(gridExtra)
@@ -7,7 +9,7 @@ library(RColorBrewer)
 library(grid)
 
 cols <- c('stat','env_rat1', 'm', 'T', 'K1', 'K2', 'Alpha1', 'Alpha2', 'M1', 'M2')
-data <- read.csv('data_mT_col2_w07.csv', header=FALSE, col.names = cols)
+data <- read.csv('data_mT_assym2_col2.csv', header=FALSE, col.names = cols)
 data$rat <- data$M1/(data$M1 + data$M2)
 
 myColors <- brewer.pal(8,"Spectral")
@@ -32,3 +34,4 @@ pKI <- ggplot(dat.mI) + geom_line(aes(x=log10(T), y=value, group=m, colour=as.fa
       scale_y_continuous(limits = c(0, 1))), each = 2))
 
 grid.arrange(prat, pKI, nrow=1)
+

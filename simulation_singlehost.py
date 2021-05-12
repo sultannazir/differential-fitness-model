@@ -1,5 +1,6 @@
 import general_functions as gf
 import csv
+from statistics import mean, variance
 import numpy as np
 
 Parameters = {'H' : 1,             # Number of hosts
@@ -9,7 +10,7 @@ Parameters = {'H' : 1,             # Number of hosts
               'stdK2' : 500,
               'stdI' : 1,          # Standard deviation of 'within-host interaction coefficients'...
                                    # of microbes in the environment
-              'env_rat1' : 0.1,    # Relative abundance of type 1 microbes in the environment = K1'/(K1' + K2')
+              'env_rat1' : 0.9,    # Relative abundance of type 1 microbes in the environment = K1'/(K1' + K2')
               'init_size' : 100,   # Initial population size of each microbe type in the host(s)
               'K_min' : 100,       # Minimum value of within-host fitness any microbe can attain
               'K1_max' : 10000,  # Maximum value of within-host fitness type 1 microbes can attain
@@ -19,11 +20,11 @@ Parameters = {'H' : 1,             # Number of hosts
               'd' : 0.0,          # Probability of death of a microbe in host at each time step
               'w' : 0.5,           # Relative effect of intraspecific interactions to interspecific interactions in
                                    # birth and death of a microbe
-              'm' : 1581,           # Size of colonizing microbe population at each time step
+              'm' : 500,           # Size of colonizing microbe population at each time step
               'sign1' : -1,        # Nature of effect of Microbe type 2 on Microbe type 1 (choose from -1,0,1)
               'sign2' : -1,        # Nature of effect of Microbe type 1 on Microbe type 2 (choose from -1,0,1)
               'b' : 0.01,         # Bottleneck ratio - fraction of number of parent's microbes inherited by offspring
-              'T' : 12,          # Host generation time - time before next bottleneck event
+              'T' : 29,          # Host generation time - time before next bottleneck event
               'sim_time' : 1999    # Simulation time
               }
 
@@ -34,8 +35,14 @@ def run_simulation_getdist(Parameters):
     data2 = []  # tracks all K2 values in time in the first host
     datai1 = []  # tracks all alpha values of type 1 microbes in the first host
     datai2 = []  # tracks all alpha values of type 2 microbes in the first host
+    scoeff = []
     K1val, K2val = gf.initialize_Kval()  # initial K distributions
     I12val, I21val = gf.initialize_Ival()  # initial alpha distributions
+
+    data1.append(K1val[0])
+    data2.append(K2val[0])
+    datai1.append(I12val[0])
+    datai2.append(I21val[0])
 
     t = 1
     while t <= gf.sim_time:
@@ -44,6 +51,20 @@ def run_simulation_getdist(Parameters):
         if t%gf.T == 0: # bottleneck event at every Tth time step
             K1val, K2val, I12val, I21val = gf.bottleneck(K1val, K2val, I12val, I21val)
 
+        if len(data1[-1])>1:
+            sK1 = mean(data1[-1])*(mean(K1val[0])-mean(data1[-1]))/variance(data1[-1])
+            sI1 = mean(datai1[-1])*(mean(I12val[0]) - mean(datai1[-1])) / variance(datai1[-1])
+        else:
+            sK1 = 0
+            sI1 = 0
+        if len(data2[-1])>1:
+            sK2 = mean(data2[-1])*(mean(K2val[0]) - mean(data2[-1])) / variance(data2[-1])
+            sI2 = mean(datai2[-1])*(mean(I21val[0]) - mean(datai2[-1])) / variance(datai2[-1])
+        else:
+            sK2 = 0
+            sI2 = 0
+
+        scoeff.append([sK1, sK2, sI1, sI2])
         data1.append(K1val[0])
         data2.append(K2val[0])
         datai1.append(I12val[0])
@@ -51,9 +72,9 @@ def run_simulation_getdist(Parameters):
         print(t)
         t += 1
 
-    return(data1, data2, datai1, datai2)
+    return(data1, data2, datai1, datai2, scoeff)
 
-data1, data2, datai1, datai2 = run_simulation_getdist(Parameters)
+data1, data2, datai1, datai2, scoeff = run_simulation_getdist(Parameters)
 
 # write data
 # can change data filenames here
@@ -73,3 +94,7 @@ with open("Data/I1.csv", "w", newline="") as f:
 with open("Data/I2.csv", "w", newline="") as f:
     writer = csv.writer(f)
     writer.writerows(datai2)
+
+with open("Data/scoeff.csv", "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerows(scoeff)

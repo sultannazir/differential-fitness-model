@@ -119,8 +119,8 @@ def update_microbes(K1val, K2val, I12val, I21val):
 
 def calc_propensity(K1val, K2val,M1, M2, I12val, I21val):
 
-    prop1 = w*(1 - M1/np.array(K1val)) + sign1*np.array(I12val)*M2/(M1+M2)
-    prop2 = w * (1 - M2 / np.array(K2val)) + sign2 * np.array(I21val) * M1 / (M1+M2)
+    prop1 = w*(1 - M1/np.array(K1val)) -d + sign1*np.array(I12val)*M2/(M1+M2)
+    prop2 = w * (1 - M2 / np.array(K2val)) -d + sign2 * np.array(I21val) * M1 / (M1+M2)
 
     return(prop1, prop2)
 
